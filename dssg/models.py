@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.text import slugify
+from django.conf import settings
 
 
 
@@ -12,8 +13,8 @@ class Category(models.Model):
                                    blank=True,)
 
     def _get_url(self):
-        return '/'.join([URL_PREFIX,
-                        self.slug,])
+        return '/'.join([settings.URL_PREFIX,
+                         self.slug,])
     url = property(_get_url)
 
     def save(self, *args, **kwargs):
@@ -45,9 +46,9 @@ class Post(models.Model):
                                blank=True,)
 
     def _get_url(self):
-        return '/'.join([URL_PREFIX,
-                        self.category.slug,
-                        self.slug + '.html',])
+        return '/'.join([settings.URL_PREFIX,
+                         self.category.slug,
+                         self.slug + '.html',])
     url = property(_get_url)
 
     def save(self, *args, **kwargs):
