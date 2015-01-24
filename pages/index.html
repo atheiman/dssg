@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}Austin Heiman Blog Home{% endblock title %}
+
+{% block content %}
+<div class="jumbotron">
+<h1>Austin Heiman's Blog</h1>
+<p>This blog was created with my own static site generator. How cool is that?</p>
+</div>
+
+<p>Here are some categories:</p>
+
+<div class="row">
+    {% for c in categories %}
+    <div class="col-xs-6 col-sm-4 col-md-3">
+        <h2>
+            <a href="{{ c.url }}">{{ c.name }}</a>
+        </h2>
+    </div>
+    {% endfor %}
+</div>
+
+<p>Here are some posts:</p>
+<div class="row">
+    {% for p in posts %}
+    <div class="col-sm-6">
+        <h2>
+            <a href="{{ p.url }}">{{ p.title }}</a>
+        </h2>
+        <h3>Category: {{ p.category }}</h3>
+        {% if p.author %}<p>Author: {{ p.author }}</p>{% endif %}
+        {% if p.date %}<p>Date: {{ p.date }}</p>{% endif %}
+        {% if p.preview %}<p>Preview: {{ p.preview }}</p>{% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% endblock content %}
