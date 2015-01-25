@@ -18,7 +18,7 @@ class Category(models.Model):
     url = property(_get_url)
 
     def __unicode__(self):
-        return self.name
+        return self.verbose_name
 
 
 

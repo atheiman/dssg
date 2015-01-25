@@ -2,7 +2,8 @@
 Utilities for dssg.
 """
 
-import os
+from os import path, listdir, mkdir
+import shutil
 import json
 
 import markdown
@@ -20,6 +21,9 @@ OUTPUT_DIR = settings.OUTPUT_DIR
 OUTPUT_BACKUP_DIR = settings.OUTPUT_BACKUP_DIR
 CATEGORY_CONFIG_FILENAME = settings.CATEGORY_CONFIG_FILENAME
 POST_TEMPLATE_NAME = settings.POST_TEMPLATE_NAME
+STATIC_DIR_NAME = settings.STATIC_DIR_NAME
+STATIC_DIR = settings.STATIC_DIR
+PAGES_DIR = settings.PAGES_DIR
 
 
 def build_category(category_path):
@@ -27,17 +31,17 @@ def build_category(category_path):
     Return a Category object from a category directory absolute path.
     """
     category_path = category_path.rstrip('/')
-    category_dn = os.path.split(category_path)[1]
-    if not os.path.isdir(category_path):
+    category_dn = path.split(category_path)[1]
+    if not path.isdir(category_path):
         msg = """Expected a directory and received [{file}]
         """.format(file=category_path).strip()
         raise ValueError(msg)
 
     # Get metadata from category-config
-    category_config = os.path.join(category_path,
+    category_config = path.join(category_path,
                                    settings.CATEGORY_CONFIG_FILENAME)
     metadata = {}
-    if os.path.exists(category_config):
+    if path.exists(category_config):
         with open(category_config, 'r') as config_file:
             raw = json.load(config_file)
         for k, v in raw.iteritems():
@@ -63,8 +67,8 @@ def build_post(md_file_path):
 
     Expects Category model to be populated for looking up related Category.
     """
-    filename = os.path.splitext(os.path.split(md_file_path)[1])
-    dirname = os.path.split(os.path.dirname(os.path.dirname(md_file_path)))[1]
+    filename = path.splitext(path.split(md_file_path)[1])
+    dirname = path.split(path.dirname(path.dirname(md_file_path)))[1]
 
     if filename[1] != '.md':
         raise Exception("Post source files must be in markdown format.")
@@ -123,29 +127,41 @@ def build_post(md_file_path):
 
 def generate_output():
     """
-    Build output at OUTPUT_DIR and return string describing generation.
+    Build output at OUTPUT_DIR and return dictionary describing generation:
 
-    Expects database to be populated, and output dir to exist.
+    {
+        'pages': int,
+        'categories': int,
+        'category_pages': int,
+        'posts': int,
+    }
+
+    Expects database to be populated, and and empty output dir to exist.
     """
-    post_counter = category_pages_counter = page_counter = 0
+    posts_counter = category_pages_counter = categories_counter = pages_counter = 0
 
     # create one-off pages at /page-name.html
     for page_name in listdir(PAGES_DIR):
-        template = get_template(page_name)
-        template_str = template.render(
-            categories=db['categories'],
-            posts=db['posts'],
-        )
+        if page_name == CATEGORY_CONFIG_FILENAME:
+            continue
+        template = get_template(path.join(path.split(PAGES_DIR)[1],page_name))
+        context = Context({
+            'categories': Category.objects.all(),
+            'posts': Post.objects.all(),
+        })
+        html = template.render(context)
 
-        with open(path.join(OUTPUT_DIR, page_name), 'w') as out_file:
-            out_file.write(template_str)
+        with open(path.join(OUTPUT_DIR, page_name), 'w') as f:
+            f.write(html)
+        pages_counter += 1
 
+    # copy static dir to output dir
+    shutil.copytree(STATIC_DIR, path.join(OUTPUT_DIR, STATIC_DIR_NAME))
 
-    # Loop through category directories
+    # place categories in output
     for c_dn in listdir(CATEGORIES_DIR):
         c_dir = path.join(CATEGORIES_DIR, c_dn)
         c_files = listdir(c_dir)
-
         c = Category.objects.get(slug=slugify(unicode(c_dn)))
         posts = Post.objects.filter(category=c)
 
@@ -154,17 +170,28 @@ def generate_output():
         mkdir(c_out_dir)
 
         # Place category pages in category output dir
-        c_page_context = Context({'posts': posts, 'category': category,})
+        c_page_context = Context({'posts': posts, 'category': c,})
         for f in c_files:
             if f not in [POSTS_DIR_NAME, POST_TEMPLATE_NAME]:
-                t = get_template(path.join(c_dn, f)))
+                t = get_template(path.join(c_dn, f))
                 html = t.render(c_page_context)
-                with open(path.join(OUTPUT_DIR, f), 'w') as out_file:
-                    out_file.write(html)
+                with open(path.join(OUTPUT_DIR, c.slug, f), 'w') as f:
+                    f.write(html)
                 category_pages_counter += 1
 
+        # Place category posts in output dir
+        post_t = get_template(path.join(c_dn, POST_TEMPLATE_NAME))
+        for p in posts:
+            html = post_t.render(Context({'post': p, 'category': c}))
+            with open(path.join(OUTPUT_DIR, c.slug, p.slug) + '.html', 'w') as f:
+                f.write(html)
+            posts_counter += 1
 
-        # create category pages at /category-slug/index.html
-        # create post pages at /category-slug/post-slug.html
-        # create json from posts list at /posts.json
+        categories_counter += 1
 
+    return {
+        'pages': pages_counter,
+        'categories': categories_counter,
+        'category_pages': category_pages_counter,
+        'posts': posts_counter,
+    }
