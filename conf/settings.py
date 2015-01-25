@@ -12,28 +12,30 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
+URL_PREFIX = "localhost:8080"  # no trailing slash
+
 CATEGORIES_DIR = os.path.join(BASE_DIR, 'categories')
 CATEGORY_CONFIG_FILENAME = 'category-config.json'
-CATEGORY_POST_TEMPLATE_NAME = 'post.html'
+POST_TEMPLATE_NAME = 'post.html'
 POSTS_DIR_NAME = 'posts'
 
-PAGES_DIR = os.path.join(BASE_DIR, 'pages')
-INCLUDES_DIR = os.path.join(BASE_DIR, 'includes')
+TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
+PAGES_DIR = os.path.join(TEMPLATES_DIR, 'pages')
+INCLUDES_DIR = os.path.join(TEMPLATES_DIR, 'includes')
 
 STATIC_DIR_NAME = 'static'
 STATIC_DIR = os.path.join(BASE_DIR, STATIC_DIR_NAME)
+STATIC_URL = os.path.join(URL_PREFIX, STATIC_DIR_NAME) + '/'
 
 OUTPUT_DIR = os.path.join(BASE_DIR, 'output')
+OUTPUT_BACKUP_DIR = os.path.join(BASE_DIR, 'output-backup')
 
 AUTHOR_DEFAULT = "Anonymous"
 PUBLISHED_DEFAULT = True       # makemigrations and migrate on change
-URL_PREFIX = "localhost:8080"  # no trailing slash
-STATIC_URL = os.path.join(URL_PREFIX, STATIC_DIR_NAME) + '/'
 
 TEMPLATE_DIRS = (
     CATEGORIES_DIR,
-    PAGES_DIR,
-    INCLUDES_DIR,
+    TEMPLATES_DIR,
 )
 
 

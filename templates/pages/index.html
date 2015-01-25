@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'includes/base.html' %}
 
 {% block title %}Austin Heiman Blog Home{% endblock title %}
 
@@ -14,7 +14,7 @@
     {% for c in categories %}
     <div class="col-xs-6 col-sm-4 col-md-3">
         <h2>
-            <a href="{{ c.url }}">{{ c.name }}</a>
+            <a href="{{ c.url }}">{{ c.verbose_name }}</a>
         </h2>
     </div>
     {% endfor %}
