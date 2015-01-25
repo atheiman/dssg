@@ -1,7 +1,8 @@
 from django.db import models
 from django.utils.text import slugify
+from django.conf import settings
 
-
+from .checks import settings_check, filesystem_check
 
 class Category(models.Model):
     name = models.CharField(max_length=100,
@@ -12,8 +13,8 @@ class Category(models.Model):
                                    blank=True,)
 
     def _get_url(self):
-        return '/'.join([URL_PREFIX,
-                        self.slug,])
+        return '/'.join([settings.URL_PREFIX,
+                         self.slug,])
     url = property(_get_url)
 
     def save(self, *args, **kwargs):
@@ -37,17 +38,17 @@ class Post(models.Model):
                                  blank=True,
                                  null=True,)
     tags_csv = models.TextField(blank=True,)
-    date = models.CharField(blank=True,
-                            null=True,)
-    published = models.BooleanField()
+    date = models.CharField(max_length=100,
+                            blank=True,)
+    published = models.BooleanField(default=settings.PUBLISHED_DEFAULT,)
     html = models.TextField()
     preview = models.TextField(max_length=500,
                                blank=True,)
 
     def _get_url(self):
-        return '/'.join([URL_PREFIX,
-                        self.category.slug,
-                        self.slug + '.html',])
+        return '/'.join([settings.URL_PREFIX,
+                         self.category.slug,
+                         self.slug + '.html',])
     url = property(_get_url)
 
     def save(self, *args, **kwargs):
