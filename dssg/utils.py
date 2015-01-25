@@ -15,7 +15,7 @@ from .models import Post, Category
 
 def build_category(category_path):
     """
-    Return a Category object from a category directory.
+    Return a Category object from a category directory absolute path.
     """
     category_path = category_path.rstrip('/')
     category_dn = os.path.split(category_path)[1]
@@ -50,7 +50,7 @@ def build_category(category_path):
 
 def build_post(md_file_path):
     """
-    Return a Post object from a post markdown source file.
+    Return a Post object from a post markdown source file absolute path.
 
     Expects Category model to be populated for looking up related Category.
     """
@@ -94,8 +94,7 @@ def build_post(md_file_path):
     else:
         tags_csv = ''
 
-    category_name = metadata.get('category',dirname)
-    category = Category.objects.get(name__iexact=category_name)
+    category = Category.objects.get(name__iexact=dirname)
 
     post = Post(
         title=title,
