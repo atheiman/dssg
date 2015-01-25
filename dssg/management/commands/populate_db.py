@@ -1,7 +1,6 @@
 from os import listdir, path
-from optparse import make_option
 
-from django.core.management.base import BaseCommand
+from django.core.management.base import NoArgsCommand
 from django.conf import settings
 
 from dssg.models import Category, Post
@@ -12,24 +11,17 @@ CATEGORIES_DIR = settings.CATEGORIES_DIR
 POSTS_DIR_NAME = settings.POSTS_DIR_NAME
 
 
-class Command(BaseCommand):
+class Command(NoArgsCommand):
     help = 'Populate the database from static site source'
 
-    option_list = BaseCommand.option_list + (
-        make_option('--delete',
-            action='store_true',
-            dest='delete',
-            default=False,
-            help='Clear database contents before populating'),
-        )
-
-    def handle(self, **options):
-        if options['delete']:
+    def handle_noargs(self, **options):
+        if Category.objects.all() or Post.objects.all():
             Category.objects.all().delete()
             Post.objects.all().delete()
-            self.stdout.write('Deleted all Category and Post db records.')
+            self.stdout.write('Deleted all existing Category and Post db records.')
 
         post_counter = category_counter = 0
+
         # Loop through category directories
         for category_dn in listdir(CATEGORIES_DIR):
             category_dir = path.join(CATEGORIES_DIR, category_dn)
@@ -46,7 +38,7 @@ class Command(BaseCommand):
                 post.save()
                 post_counter +=1
         self.stdout.write(
-            '{c} Categories and {p} Posts created.'.format(
+            '{c} Category and {p} Post db records created.'.format(
                 c=category_counter, p=post_counter)
         )
 

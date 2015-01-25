@@ -8,9 +8,18 @@ import json
 import markdown
 from django.utils.text import slugify
 from django.conf import settings
+from django.template import Context
+from django.template.loader import get_template
 
 from .models import Post, Category
 
+
+CATEGORIES_DIR = settings.CATEGORIES_DIR
+POSTS_DIR_NAME = settings.POSTS_DIR_NAME
+OUTPUT_DIR = settings.OUTPUT_DIR
+OUTPUT_BACKUP_DIR = settings.OUTPUT_BACKUP_DIR
+CATEGORY_CONFIG_FILENAME = settings.CATEGORY_CONFIG_FILENAME
+POST_TEMPLATE_NAME = settings.POST_TEMPLATE_NAME
 
 
 def build_category(category_path):
@@ -34,12 +43,12 @@ def build_category(category_path):
         for k, v in raw.iteritems():
             metadata[k.lower()] = v
 
-    name = metadata.get('name', unicode(category_dn.title()))
-    slug = slugify(unicode(metadata.get('slug', category_dn)))
+    verbose_name = metadata.get('verbose_name', category_dn.title())
+    slug = slugify(unicode(category_dn))
     description = metadata.get('description', '')
 
     category = Category(
-        name=name,
+        verbose_name=verbose_name,
         slug=slug,
         description=description,
     )
@@ -77,7 +86,7 @@ def build_post(md_file_path):
     author = metadata.get('author', settings.AUTHOR_DEFAULT)
     date = metadata.get('date', '')
     title = metadata.get('title', filename[0].title())
-    slug = slugify(unicode(metadata.get('slug', filename[0])))
+    slug = slugify(unicode(filename[0]))
     preview = metadata.get('preview', '')
 
     published = metadata.get('published')
@@ -94,7 +103,7 @@ def build_post(md_file_path):
     else:
         tags_csv = ''
 
-    category = Category.objects.get(name__iexact=dirname)
+    category = Category.objects.get(slug=slugify(unicode(dirname)))
 
     post = Post(
         title=title,
@@ -109,3 +118,53 @@ def build_post(md_file_path):
     )
 
     return post
+
+
+
+def generate_output():
+    """
+    Build output at OUTPUT_DIR and return string describing generation.
+
+    Expects database to be populated, and output dir to exist.
+    """
+    post_counter = category_pages_counter = page_counter = 0
+
+    # create one-off pages at /page-name.html
+    for page_name in listdir(PAGES_DIR):
+        template = get_template(page_name)
+        template_str = template.render(
+            categories=db['categories'],
+            posts=db['posts'],
+        )
+
+        with open(path.join(OUTPUT_DIR, page_name), 'w') as out_file:
+            out_file.write(template_str)
+
+
+    # Loop through category directories
+    for c_dn in listdir(CATEGORIES_DIR):
+        c_dir = path.join(CATEGORIES_DIR, c_dn)
+        c_files = listdir(c_dir)
+
+        c = Category.objects.get(slug=slugify(unicode(c_dn)))
+        posts = Post.objects.filter(category=c)
+
+        # make empty category output dir
+        c_out_dir = path.join(OUTPUT_DIR, c.slug)
+        mkdir(c_out_dir)
+
+        # Place category pages in category output dir
+        c_page_context = Context({'posts': posts, 'category': category,})
+        for f in c_files:
+            if f not in [POSTS_DIR_NAME, POST_TEMPLATE_NAME]:
+                t = get_template(path.join(c_dn, f)))
+                html = t.render(c_page_context)
+                with open(path.join(OUTPUT_DIR, f), 'w') as out_file:
+                    out_file.write(html)
+                category_pages_counter += 1
+
+
+        # create category pages at /category-slug/index.html
+        # create post pages at /category-slug/post-slug.html
+        # create json from posts list at /posts.json
+

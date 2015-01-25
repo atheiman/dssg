@@ -1,5 +1,4 @@
 {
-    "name": "Technology",
-    "slug": "tech",
-    "Description": "Posts related to tech gadgets and innovations."
+    "verbose_name": "Technology",
+    "description": "Posts related to tech gadgets and innovations."
 }

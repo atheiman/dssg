@@ -6,6 +6,7 @@ from django.conf import settings
 
 CATEGORIES_DIR = settings.CATEGORIES_DIR
 POSTS_DIR_NAME = settings.POSTS_DIR_NAME
+POST_TEMPLATE_NAME = settings.POST_TEMPLATE_NAME
 
 
 @register('settings')
@@ -13,7 +14,7 @@ def settings_check(app_configs, **kwargs):
     required_attrs = [
         'CATEGORIES_DIR',
         'CATEGORY_CONFIG_FILENAME',
-        'CATEGORY_POST_TEMPLATE_NAME',
+        'POST_TEMPLATE_NAME',
         'POSTS_DIR_NAME',
         'PAGES_DIR',
         'INCLUDES_DIR',
@@ -57,6 +58,17 @@ def filesystem_check(app_configs, **kwargs):
                         obj=post_filename,
                         id='dssg.E003',
                     ))
+            if POST_TEMPLATE_NAME not in listdir(path.join(CATEGORIES_DIR,
+                                                           category_dn)):
+                hint = """Place a {fn} template in {dir} for rendering posts
+                """.format(fn=POST_TEMPLATE_NAME, dir=path.join(CATEGORIES_DIR,
+                                                                category_dn))
+                errors.append(Error(
+                    "No post template file found",
+                    hint=hint.strip(),
+                    obj=category_dn,
+                    id='dssg.E004',
+                ))
 
         except OSError:   # non dir in categories/
             hint = """Only category directories should exist in {dir}

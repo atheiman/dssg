@@ -14,7 +14,6 @@ Metadata stored at the top of each Post markdown source file. Defaults are gener
 author: Austin Heiman
 date: Jan 24 2015
 title: Python JSON Basics
-slug: python-json-basics
 tags: python, json, javascript
 preview: An introduction to the json builtin Python module.
 published: True
@@ -34,8 +33,7 @@ url
 JSON keys stored in each category's `category-config.json`:
 
 ```
-name
-slug
+verbose_name
 description
 posts_dir
 post_template
@@ -83,7 +81,11 @@ The category directory name comes from the `category-config.json` `slug` key. Th
 
 ### Template Inheritance
 
-All templates in the `pages/` directory are rendered and dropped in the `output/` directory. Create templates that are for including or extending in the `includes/` directory, so that they are not put into the `output/` directory.
+`TEMPLATES_DIR` should contain `includes/` and `pages/` `TEMPLATE_DIRS` should be set to `(CATEGORIES_DIR, TEMPLATES_DIR)`. All templates in the `pages/` directory are rendered and dropped in the `output/` directory.
+
+Create templates that are for including or extending in the `includes/` directory, so that they are not put into the `output/` directory. Include them in a namespaced fashion. For example, place `base.html` in `includes/` and extend it in `pages/index.html` with `{% extends 'includes/base.html' %}`.
+
+A global post template could exist in `includes/` also, and be extended in each categories `post.html` with the same strategy.
 
 
 
