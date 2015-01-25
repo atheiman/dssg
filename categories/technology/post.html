@@ -1,18 +1,1 @@
-{% extends 'includes/base.html' %}
-
-{% block body %}
-<h1>{{ post.title }}</h1>
-<h2>Posted in {{ category }}</h2>
-
-<p>
-    {% if post.author %}
-        <em>{{ post.author }}</em><br>
-    {% endif %}
-    {% if post.date %}
-        {{ post.date }}<br>
-    {% endif %}
-</p>
-
-{{ post.html }}
-
-{% endblock body %}
+{% include 'includes/post.html' %}

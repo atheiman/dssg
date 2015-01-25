@@ -1,0 +1,13 @@
+{% for p in posts %}
+<div class="col-sm-6">
+    <h2>
+        <a href="{{ p.url }}">{{ p.title }}</a>
+    </h2>
+    <h3>Category: {{ p.category }}</h3>
+    <p>
+        {% if p.author %}{{ p.author }}, {% endif %}
+        {% if p.date %}{{ p.date }}{% endif %}
+    </p>
+    {% if p.preview %}<p>{{ p.preview }}</p>{% endif %}
+</div>
+{% endfor %}

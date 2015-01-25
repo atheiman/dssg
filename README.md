@@ -35,9 +35,20 @@ JSON keys stored in each category's `category-config.json`:
 ```
 verbose_name
 description
-posts_dir
-post_template
-index_template
+```
+
+
+
+## Generation
+
+```shell
+$ ./manage.py migrate
+
+# make all your post source markdown files before continuing...
+
+$ ./manage.py populate_db
+
+$ ./manage.py generate_output
 ```
 
 
@@ -66,9 +77,9 @@ A `categories/` directory contains category dirs. Each category directory should
 
 - `posts/` directory containing post markdown source files. The markdown source files should include metadata at the top as described in the quick reference above.
 
-- `post.html` template that is run through the template engine for each post with the context variables `post` and `category` and can extend / include any templates in the `TEMPLATE_DIRS`.
+- `post.html` template that is run through the template engine for each post with the context variables `p` and `c` for the post and category and can extend / include any templates in the `TEMPLATE_DIRS`.
 
-- Other templates for rendering category pages. Similar to the `pages/` directory, you might want an `index.html`. These templates are rendered with the context variables `category` and `posts`, and can extend / include any templates in the `TEMPLATE_DIRS`.
+- Other templates for rendering category pages. Similar to the `pages/` directory, you might want an `index.html`. These templates are rendered with the context variables `c` for the category and `posts`, and can extend / include any templates in the `TEMPLATE_DIRS`.
 
 > **Note**<br>
 > Posts *must* be categorized. If you don't like this, you could make an `uncategorized` Category.
@@ -80,6 +91,8 @@ The category directory name comes from the `category-config.json` `slug` key. Th
 
 
 ### Template Inheritance
+
+All templates are rendered with the `categories` context variable for all category objects.
 
 `TEMPLATES_DIR` should contain `includes/` and `pages/` `TEMPLATE_DIRS` should be set to `(CATEGORIES_DIR, TEMPLATES_DIR)`. All templates in the `pages/` directory are rendered and dropped in the `output/` directory.
 

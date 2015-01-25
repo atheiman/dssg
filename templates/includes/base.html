@@ -3,7 +3,7 @@
 
 <head>
     {% block head %}
-    <title>{% block title %}Generated Blog{% endblock title %}</title>
+    <title>{% block title %}Austin Heiman's Blog{% endblock title %}</title>
     <!-- Bootstrap -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
     <!-- Bootstrap theme -->
@@ -12,11 +12,27 @@
 </head>
 
 <body>
+    <div class="container">
+        <h1><a href="/">Home</a></h1>
+
+        <div id='nav'>
+            {% for c in categories %}
+                <a href="{{ c.url }}">{{ c.verbose_name }}</a>
+            {% endfor %}
+        </div>
+    </div>
+
     {% block body %}
     <div class="container">
         {% block content %}
         <div class="alert alert-danger">Error - no content provided to base template.</div>
         {% endblock content %}
+    </div>
+
+    <div class="container">
+        <footer>
+            Created using <a href="https://github.com/atheiman/dssg">Django Static Site Generator</a>.
+        </footer>
     </div>
 
     <!-- jQuery -->
