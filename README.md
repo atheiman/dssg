@@ -1,6 +1,6 @@
 # dssg - Django Static Site Generator
 
-Here we go. Second attempt at the static site generator. The idea with this one is that Blog posts will be stored in a sqlite db. It was way to much work trying to make my own db with basically dicts.
+Here we go. Second attempt at the static site generator.
 
 
 
