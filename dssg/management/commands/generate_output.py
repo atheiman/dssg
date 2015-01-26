@@ -1,5 +1,5 @@
 import shutil
-from os import path, mkdir
+from os import path, mkdir, listdir, remove, unlink
 
 from django.core.management.base import NoArgsCommand
 from django.conf import settings
@@ -34,12 +34,17 @@ class Command(NoArgsCommand):
                 "Database OperationalError, have you run `migrate`? Exiting."
             )
 
-        # replace output-backup, create empty output
-        shutil.rmtree(OUTPUT_BACKUP_DIR, ignore_errors=True)
-        if path.isdir(OUTPUT_DIR):
-            self.stdout.write('Moving existing output dir to output backup.')
-            shutil.move(OUTPUT_DIR, OUTPUT_BACKUP_DIR)
-        mkdir(OUTPUT_DIR)
+        # empty the backup dir
+        if not path.isdir(OUTPUT_DIR):
+            mkdir(OUTPUT_DIR)
+        for fn in listdir(OUTPUT_DIR):
+            f = path.join(OUTPUT_DIR, fn)
+            if path.isdir(f):
+                shutil.rmtree(f)
+            elif path.islink:
+                unlink(f)
+            elif path.isfile(f):
+                remove(f)
 
         summary = generate_output()
 
