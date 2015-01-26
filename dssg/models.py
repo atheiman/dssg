@@ -31,7 +31,8 @@ class Post(models.Model):
                               blank=True,)
     category = models.ForeignKey(Category,
                                  blank=True,
-                                 null=True,)
+                                 null=True,
+                                 related_name='posts')
     tags_csv = models.TextField(blank=True,)
     date = models.CharField(max_length=100,
                             blank=True,)

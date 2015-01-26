@@ -1,0 +1,17 @@
+{% extends 'includes/base.html' %}
+
+{% block title %}{{ p.title }} | {{ c.verbose_name }}{% endblock %}
+
+{% block content %}
+
+<h1>{{ p.title }}</h1>
+<p>Posted in <a href="{{ c.url }}">{{ c.verbose_name }}</a></p>
+<p>
+    {% if p.author %}<strong>{{ p.author }}</strong><br>{% endif %}
+    {% if p.date %}{{ p.date }}<br>{% endif %}
+    {% if p.tags_csv %}Tags: {{ p.tags_csv }}<br>{% endif %}
+</p>
+
+{{ p.html|safe }}
+
+{% endblock content %}

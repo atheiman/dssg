@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
-URL_PREFIX = "localhost:8080"  # no trailing slash
+URL_PREFIX = ""  # no trailing slash
 
 CATEGORIES_DIR = os.path.join(BASE_DIR, 'categories')
 CATEGORY_CONFIG_FILENAME = 'category-config.json'

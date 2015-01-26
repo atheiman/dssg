@@ -1,0 +1,14 @@
+{% extends 'includes/base.html' %}
+
+{% block title %}{{ c.verbose_name }}{% endblock title %}
+
+{% block content %}
+<div class="jumbotron">
+<h1>{{ c.verbose_name }}</h1>
+{% if c.description %}<p>{{ c.description }}</p>{% endif %}
+</div>
+
+<p>Here are some posts:</p>
+{% include 'includes/post_list.html' %}
+
+{% endblock content %}

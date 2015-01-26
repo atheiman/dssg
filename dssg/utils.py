@@ -142,8 +142,6 @@ def generate_output():
 
     # create one-off pages at /page-name.html
     for page_name in listdir(PAGES_DIR):
-        if page_name == CATEGORY_CONFIG_FILENAME:
-            continue
         template = get_template(path.join(path.split(PAGES_DIR)[1],page_name))
         context = Context({
             'categories': Category.objects.all(),
@@ -163,26 +161,39 @@ def generate_output():
         c_dir = path.join(CATEGORIES_DIR, c_dn)
         c_files = listdir(c_dir)
         c = Category.objects.get(slug=slugify(unicode(c_dn)))
-        posts = Post.objects.filter(category=c)
+        posts = c.posts.all()
 
         # make empty category output dir
         c_out_dir = path.join(OUTPUT_DIR, c.slug)
         mkdir(c_out_dir)
 
         # Place category pages in category output dir
-        c_page_context = Context({'posts': posts, 'category': c,})
+        c_page_context = Context({
+            'posts': posts,
+            'c': c,
+            'categories': Category.objects.all(),
+        })
         for f in c_files:
-            if f not in [POSTS_DIR_NAME, POST_TEMPLATE_NAME]:
-                t = get_template(path.join(c_dn, f))
-                html = t.render(c_page_context)
-                with open(path.join(OUTPUT_DIR, c.slug, f), 'w') as f:
-                    f.write(html)
-                category_pages_counter += 1
+            if f in [POSTS_DIR_NAME,
+                     POST_TEMPLATE_NAME,
+                     CATEGORY_CONFIG_FILENAME]:
+                continue
+            t = get_template(path.join(c_dn, f))
+            html = t.render(c_page_context)
+            with open(path.join(OUTPUT_DIR, c.slug, f), 'w') as f:
+                f.write(html)
+            category_pages_counter += 1
 
         # Place category posts in output dir
         post_t = get_template(path.join(c_dn, POST_TEMPLATE_NAME))
         for p in posts:
-            html = post_t.render(Context({'post': p, 'category': c}))
+            if not p.published:
+                continue
+            html = post_t.render(Context({
+                'p': p,
+                'c': c,
+                'categories': Category.objects.all(),
+            }))
             with open(path.join(OUTPUT_DIR, c.slug, p.slug) + '.html', 'w') as f:
                 f.write(html)
             posts_counter += 1

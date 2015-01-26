@@ -1,12 +1,14 @@
 {% extends 'includes/base.html' %}
 
-{% block title %}Austin Heiman Blog Home{% endblock title %}
+{% block title %}Austin Heiman's Blog{% endblock title %}
 
 {% block content %}
 <div class="jumbotron">
 <h1>Austin Heiman's Blog</h1>
-<p>This blog was created with my own static site generator. How cool is that?</p>
+<p>This blog was created with <a href="https://github.com/atheiman/dssg">Django Static Site Generator</a>. How cool is that?</p>
 </div>
+
+<p>Check out my <a href="/about_me.html">about me</a> page!</p>
 
 <p>Here are some categories:</p>
 
@@ -21,17 +23,6 @@
 </div>
 
 <p>Here are some posts:</p>
-<div class="row">
-    {% for p in posts %}
-    <div class="col-sm-6">
-        <h2>
-            <a href="{{ p.url }}">{{ p.title }}</a>
-        </h2>
-        <h3>Category: {{ p.category }}</h3>
-        {% if p.author %}<p>Author: {{ p.author }}</p>{% endif %}
-        {% if p.date %}<p>Date: {{ p.date }}</p>{% endif %}
-        {% if p.preview %}<p>Preview: {{ p.preview }}</p>{% endif %}
-    </div>
-    {% endfor %}
-</div>
+{% include 'includes/post_list.html' %}
+
 {% endblock content %}
