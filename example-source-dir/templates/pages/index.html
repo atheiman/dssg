@@ -1,0 +1,28 @@
+{% extends 'includes/base.html' %}
+
+{% block title %}Austin Heiman's Blog{% endblock title %}
+
+{% block content %}
+<div class="jumbotron">
+<h1>Austin Heiman's Blog</h1>
+<p>This blog was created with <a href="https://github.com/atheiman/dssg">Django Static Site Generator</a>. How cool is that?</p>
+</div>
+
+<p>Check out my <a href="/about_me.html">about me</a> page!</p>
+
+<p>Here are some categories:</p>
+
+<div class="row">
+    {% for c in categories %}
+    <div class="col-xs-6 col-sm-4 col-md-3">
+        <h2>
+            <a href="{{ c.url }}">{{ c.verbose_name }}</a>
+        </h2>
+    </div>
+    {% endfor %}
+</div>
+
+<p>Here are some posts:</p>
+{% include 'includes/post_list.html' %}
+
+{% endblock content %}
