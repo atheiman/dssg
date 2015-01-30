@@ -14,5 +14,5 @@ def args_check():
 
 if __name__ == '__main__':
     args_check()
-    from dssg.generate import execute_from_command_line
-    execute_from_command_line()
+    from dssg.generate import generate
+    generate(sys.argv[1].rstrip('/'))

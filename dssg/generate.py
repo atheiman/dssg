@@ -4,12 +4,12 @@ Script that wraps and steps through the dssg generation process.
 
 import sys
 
-from .checks import source_dir_check
+from .checks import check_all
 from .defaults import *
 
 
-def execute_from_command_line():
+def generate(source_dir):
     """
     Generate static site from command line with command `dssg <source-dir>`
     """
-    source_dir_check()
+    check_all(source_dir)
