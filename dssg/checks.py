@@ -12,7 +12,7 @@ import shutil
 from .defaults import *
 
 
-MSG = "Error in source directory:\n\t"
+MSG = "ERROR - Source directory improper, correct the following issues:\n\t"
 
 
 def check_all(source_dir):
@@ -48,41 +48,29 @@ def check_source_dir(source_d):
     if not os.path.isdir(source_d):
         return 'Source directory is not a directory [{d}]'.format(d=source_d)
 
-    if CATEGORIES_DIR in os.listdir(source_d):
-        c_exists = True
-    else:
-        print "WARNING - CATEGORIES_DIR not found [{}]".format(
-            os.path.join(source_d, CATEGORIES_DIR)
-        )
-        c_exists = False
-    if TEMPLATES_DIR in os.listdir(source_d):
-        t_exists = True
-    else:
-        print "WARNING - TEMPLATES_DIR not found [{}]".format(
-            os.path.join(source_d, TEMPLATES_DIR)
-        )
-        t_exists = False
-    c_t_msg = ("Either CATEGORIES_DIR or TEMPLATES_DIR must exist"
+    c_t_msg = ("Either CATEGORIES_DIR or TEMPLATES_DIR must exist "
                "and not be empty.")
-    if c_exists and not os.path.isdir(os.path.join(source_d, CATEGORIES_DIR)):
-        return 'CATEGORIES_DIR is not a directory [{d}]'.format(
+
+    c_dir = os.path.join(source_d, CATEGORIES_DIR)
+    if CATEGORIES_DIR in os.listdir(source_d) and os.listdir(c_dir):
+        c_usable = True
+    else:
+        c_usable = False
+    t_dir = os.path.join(source_d, TEMPLATES_DIR)
+    if TEMPLATES_DIR in os.listdir(source_d) and os.listdir(t_dir):
+        t_usable = True
+    else:
+        t_usable = False
+    if not c_usable and not t_usable:
+        return c_t_msg
+    if not c_usable:
+        print "WARNING - CATEGORIES_DIR not found or empty [{d}]".format(
             d=os.path.join(source_d, CATEGORIES_DIR)
         )
-    if t_exists and not os.path.isdir(os.path.join(source_d, TEMPLATES_DIR)):
-        return 'TEMPLATES_DIR is not a directory [{d}]'.format(
-                d=os.path.join(source_d, TEMPLATES_DIR)
+    if not t_usable:
+        print "WARNING - TEMPLATES_DIR not found or empty [{d}]".format(
+            d=os.path.join(source_d, TEMPLATES_DIR)
         )
-
-    try:
-        c_bad = not bool(os.listdir(os.path.join(source_d, CATEGORIES_DIR)))
-    except:
-        c_bad = True
-    try:
-        t_bad = not bool(os.listdir(os.path.join(source_d, TEMPLATES_DIR)))
-    except:
-        t_bad = True
-    if c_bad and t_bad:
-        return c_t_msg
 
     # get rid of 'c' files that are generated when dir is tested
     if 'c' in os.listdir(source_d):
