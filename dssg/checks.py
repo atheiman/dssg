@@ -5,9 +5,9 @@ Check functions are wrapped by check_all(). Check functions should return an
 error message as soon as an error is encountered.
 """
 
-import sys
 import os
 import fnmatch
+import shutil
 
 from .defaults import *
 
@@ -23,6 +23,8 @@ def check_all(source_dir):
         check_source_dir(source_dir),
         check_categories_dir(os.path.join(source_dir, CATEGORIES_DIR)),
         check_templates_dir(os.path.join(source_dir, TEMPLATES_DIR)),
+        check_output_dir(OUTPUT_DIR),
+        check_temp_db(TEMP_DB),
     ]
     errors = []
     for check_result in checks:
@@ -30,9 +32,38 @@ def check_all(source_dir):
             raise SystemExit(MSG + check_result)
 
 
+def check_output_dir(output_dir):
+    shutil.rmtree(OUTPUT_BACKUP_DIR, ignore_errors=True)
+    if os.path.isdir(output_dir) and os.listdir(output_dir):
+        shutil.move(output_dir, OUTPUT_BACKUP_DIR)
+    shutil.rmtree(OUTPUT_DIR, ignore_errors=True)
+
+
+def check_temp_db(temp_db):
+    if os.path.isfile(temp_db):
+        os.remove(temp_db)
+
+
 def check_source_dir(source_d):
-    c_exists = True if CATEGORIES_DIR in os.listdir(source_d) else False
-    t_exists = True if TEMPLATES_DIR in os.listdir(source_d) else False
+    if not os.path.isdir(source_d):
+        return 'Source directory is not a directory [{d}]'.format(d=source_d)
+
+    if CATEGORIES_DIR in os.listdir(source_d):
+        c_exists = True
+    else:
+        print "WARNING - CATEGORIES_DIR not found [{}]".format(
+            os.path.join(source_d, CATEGORIES_DIR)
+        )
+        c_exists = False
+    if TEMPLATES_DIR in os.listdir(source_d):
+        t_exists = True
+    else:
+        print "WARNING - TEMPLATES_DIR not found [{}]".format(
+            os.path.join(source_d, TEMPLATES_DIR)
+        )
+        t_exists = False
+    c_t_msg = ("Either CATEGORIES_DIR or TEMPLATES_DIR must exist"
+               "and not be empty.")
     if c_exists and not os.path.isdir(os.path.join(source_d, CATEGORIES_DIR)):
         return 'CATEGORIES_DIR is not a directory [{d}]'.format(
             d=os.path.join(source_d, CATEGORIES_DIR)
@@ -42,15 +73,18 @@ def check_source_dir(source_d):
                 d=os.path.join(source_d, TEMPLATES_DIR)
         )
 
-    c_empty = not bool(os.listdir(os.path.join(source_d, CATEGORIES_DIR)))
-    t_empty = not bool(os.listdir(os.path.join(source_d, TEMPLATES_DIR)))
-    msg = "Either CATEGORIES_DIR or TEMPLATES_DIR must exist and not be empty."
-    if (not c_exists or c_empty) and (not t_exists or t_empty):
-        return msg
-    if (not t_exists or t_empty) and (not c_exists or c_empty):
-        return msg
+    try:
+        c_bad = not bool(os.listdir(os.path.join(source_d, CATEGORIES_DIR)))
+    except:
+        c_bad = True
+    try:
+        t_bad = not bool(os.listdir(os.path.join(source_d, TEMPLATES_DIR)))
+    except:
+        t_bad = True
+    if c_bad and t_bad:
+        return c_t_msg
 
-    # get rid of these fucking 'c' files that are generated when dir is tested
+    # get rid of 'c' files that are generated when dir is tested
     if 'c' in os.listdir(source_d):
         os.remove(os.path.join(source_d, 'c'))
         print 'removed binary file %s' % os.path.join(source_d, 'c')
@@ -92,6 +126,6 @@ def check_categories_dir(categories_dir):
 
 def check_templates_dir(templates_dir):
     if not os.path.isdir(templates_dir):
-        # categories dir not required
+        # templates dir not required
         return
     return

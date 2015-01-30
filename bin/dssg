@@ -7,10 +7,8 @@ import os
 SOURCE_DIR = sys.argv[1]
 
 def args_check():
-    msg = (
-        'usage: dssg <source-directory>\n'
-        'for more help, read the docs: https://github.com/atheiman/dssg/wiki'
-    )
+    msg = ('usage: dssg <source-directory>\nfor more help, read the docs: '
+           'https://github.com/atheiman/dssg/wiki')
     # if len(sys.argv) != 2 or not os.path.isdir(sys.argv[1]):
     if len(sys.argv) != 2:
         raise SystemExit(msg)

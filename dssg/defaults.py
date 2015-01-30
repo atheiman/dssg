@@ -6,9 +6,6 @@ These are overridden by a config.py if it exists.
 
 import os
 import sys
-import imp
-
-from .utils.filesystem import get_abs_path
 
 
 SOURCE_DIR = sys.argv[1]
@@ -42,18 +39,13 @@ SHORT_DATE_FORMAT = 'm/d/Y'
 TEMP_DB = 'db.sqlite3'
 
 
-binary_config = os.path.join(os.path.abspath(SOURCE_DIR), CONFIGURATION_FILE)+'c'
-def remove_binary_config():
-    if os.path.isfile(binary_config):
-        os.remove(binary_config)
-        print 'Removed binary config_file [%s]' % binary_config
-
-sys.path.insert(1, os.path.abspath(SOURCE_DIR))
-try:
-    remove_binary_config()
-    from config import *
-    print 'Imported configuration file [%s]' % os.path.abspath(SOURCE_DIR)
-    print os.path.abspath(SOURCE_DIR)+'c'
-    remove_binary_config()
-except ImportError:
-    pass
+config_file_path = os.path.join(SOURCE_DIR, CONFIGURATION_FILE)
+if os.path.isfile(config_file_path):
+    with open(config_file_path, 'r') as config_file:
+        config_file_text = config_file.read()
+    try:
+        exec(compile(config_file_text, "config.py", 'exec'))
+    except Exception as e:
+        raise SystemExit('Failed to import CONFIGURATION_FILE [{f}]. \n\t'
+                         'Exception: {e}'.format(f=config_file_path, e=e))
+    print 'INFO - Imported configuration file [{f}]'.format(f=config_file_path)
