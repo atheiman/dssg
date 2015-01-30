@@ -12,7 +12,7 @@ import fnmatch
 from .defaults import *
 
 
-MSG = "Error in source directory:\n"
+MSG = "Error in source directory:\n\t"
 
 
 def check_all(source_dir):

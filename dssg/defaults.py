@@ -15,7 +15,7 @@ SOURCE_DIR = sys.argv[1]
 CONFIGURATION_FILE = 'config.py'
 
 
-URL_PREFIX = 'oh no'
+URL_PREFIX = ''
 GLOBAL_CONTEXT = {}
 DEFAULT_POST_FILE_EXTENSION = '.html'
 OUTPUT_DIR = 'output'
@@ -42,11 +42,18 @@ SHORT_DATE_FORMAT = 'm/d/Y'
 TEMP_DB = 'db.sqlite3'
 
 
-# print get_abs_path(SOURCE_DIR)
-config_file_path = os.path.join(SOURCE_DIR, CONFIGURATION_FILE)
-if os.path.isfile(os.path.join(SOURCE_DIR, CONFIGURATION_FILE)):
-    config = imp.load_source('config.py', get_abs_path(SOURCE_DIR))
-    print config
-    from config import *
+binary_config = os.path.join(os.path.abspath(SOURCE_DIR), CONFIGURATION_FILE)+'c'
+def remove_binary_config():
+    if os.path.isfile(binary_config):
+        os.remove(binary_config)
+        print 'Removed binary config_file [%s]' % binary_config
 
-print URL_PREFIX
+sys.path.insert(1, os.path.abspath(SOURCE_DIR))
+try:
+    remove_binary_config()
+    from config import *
+    print 'Imported configuration file [%s]' % os.path.abspath(SOURCE_DIR)
+    print os.path.abspath(SOURCE_DIR)+'c'
+    remove_binary_config()
+except ImportError:
+    pass
