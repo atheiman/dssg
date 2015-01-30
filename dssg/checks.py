@@ -34,11 +34,11 @@ def check_source_dir(source_d):
     c_exists = True if CATEGORIES_DIR in os.listdir(source_d) else False
     t_exists = True if TEMPLATES_DIR in os.listdir(source_d) else False
     if c_exists and not os.path.isdir(os.path.join(source_d, CATEGORIES_DIR)):
-        return MSG + 'CATEGORIES_DIR is not a directory [{d}]'.format(
+        return 'CATEGORIES_DIR is not a directory [{d}]'.format(
             d=os.path.join(source_d, CATEGORIES_DIR)
         )
     if t_exists and not os.path.isdir(os.path.join(source_d, TEMPLATES_DIR)):
-        return MSG + 'TEMPLATES_DIR is not a directory [{d}]'.format(
+        return 'TEMPLATES_DIR is not a directory [{d}]'.format(
                 d=os.path.join(source_d, TEMPLATES_DIR)
         )
 
@@ -46,9 +46,18 @@ def check_source_dir(source_d):
     t_empty = not bool(os.listdir(os.path.join(source_d, TEMPLATES_DIR)))
     msg = "Either CATEGORIES_DIR or TEMPLATES_DIR must exist and not be empty."
     if (not c_exists or c_empty) and (not t_exists or t_empty):
-        return MSG + msg
+        return msg
     if (not t_exists or t_empty) and (not c_exists or c_empty):
-        return MSG + msg
+        return msg
+
+    # get rid of these fucking 'c' files that are generated when dir is tested
+    if 'c' in os.listdir(source_d):
+        os.remove(os.path.join(source_d, 'c'))
+        print 'removed binary file %s' % os.path.join(source_d, 'c')
+    c_file = os.path.split(source_d)[1] + 'c'
+    if c_file in os.listdir(os.path.dirname(os.path.abspath(source_d))):
+        os.remove(c_file)
+        print 'removed binary file %s' % c_file
 
 
 def check_categories_dir(categories_dir):
@@ -59,8 +68,7 @@ def check_categories_dir(categories_dir):
     for category_dn in os.listdir(categories_dir):
         category_dir = os.path.join(categories_dir, category_dn)
         if not os.path.isdir(category_dir):
-            return (MSG +
-                    "Non directory found in CATEGORIES_DIR "
+            return ("Non directory found in CATEGORIES_DIR "
                     "[{d}]".format(d=category_dir))
 
         if POSTS_DIR in os.listdir(category_dir):
@@ -69,8 +77,7 @@ def check_categories_dir(categories_dir):
             p_template_needed = bool(os.listdir(posts_dir))
             for post_fn in os.listdir(posts_dir):
                 if os.path.splitext(post_fn)[1] != '.md':
-                    return (MSG +
-                            "File without .md extension found in POSTS_DIR "
+                    return ("File without .md extension found in POSTS_DIR "
                             "[{f}]".format(f=os.path.join(category_dir,
                                                           POSTS_DIR,
                                                           post_fn)))
@@ -79,8 +86,7 @@ def check_categories_dir(categories_dir):
                     p_template_exists = True
                     break
             if not p_template_exists and p_template_needed:
-                return (MSG +
-                        "No post template found matching POST_TEMPLATES_MATCH"
+                return ("No post template found matching POST_TEMPLATES_MATCH"
                         " in category directory [{dir}]".format(category_dir))
 
 

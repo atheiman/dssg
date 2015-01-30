@@ -11,6 +11,7 @@ import imp
 from .utils.filesystem import get_abs_path
 
 
+SOURCE_DIR = sys.argv[1]
 CONFIGURATION_FILE = 'config.py'
 
 
@@ -41,6 +42,11 @@ SHORT_DATE_FORMAT = 'm/d/Y'
 TEMP_DB = 'db.sqlite3'
 
 
-if os.path.isfile(os.path.join(sys.argv[1], CONFIGURATION_FILE)):
-    config = imp.load_source('config', get_abs_path(sys.argv[1]))
+# print get_abs_path(SOURCE_DIR)
+config_file_path = os.path.join(SOURCE_DIR, CONFIGURATION_FILE)
+if os.path.isfile(os.path.join(SOURCE_DIR, CONFIGURATION_FILE)):
+    config = imp.load_source('config.py', get_abs_path(SOURCE_DIR))
+    print config
     from config import *
+
+print URL_PREFIX

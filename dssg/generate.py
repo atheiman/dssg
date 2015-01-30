@@ -2,8 +2,6 @@
 Script that wraps and steps through the dssg generation process.
 """
 
-import sys
-
 from .checks import check_all
 from .defaults import *
 
