@@ -1,20 +1,22 @@
 def info(string, obj=None):
-    string = "INFO:\n\n%s" % string
+    string = "INFO - %s" % string
     if obj:
-        string += "\n\t%s\n" % obj
+        string += " - %s" % obj
     print string
 
 
 def warn(string, obj=None):
-    string = "WARNING:\n\n%s" % string
+    string = "WARNING - %s" % string
     if obj:
-        string += "\n\t%s\n" % obj
+        string += " - %s" % obj
     print string
 
 
-def error(string, obj=None):
-    string = "ERROR:\n\n%s" % string
+def error(string, exception=None, obj=None):
+    string = "ERROR - %s" % string
     if obj:
-        string += "\n\t%s\n" % obj
-    string += "\nCorrect the above issue before continuing."
+        string += " - %s" % obj
+    if exception:
+        string += "\n\tException: %s" % exception
+    string += "\nCorrect the above error before continuing."
     raise SystemExit(string)

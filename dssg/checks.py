@@ -14,24 +14,25 @@ import os
 import fnmatch
 import shutil
 
-from .defaults import *
+from django.conf import settings
+
 from .utils.simplog import error, warn, info
 
 
 def check_all(source_dir):
     check_source_dir(source_dir),
-    check_categories_dir(os.path.join(source_dir, CATEGORIES_DIR)),
-    check_templates_dir(os.path.join(source_dir, TEMPLATES_DIR)),
-    check_static_dir(os.path.join(source_dir, STATIC_DIR)),
-    check_output_dir(OUTPUT_DIR),
-    check_temp_db(TEMP_DB),
+    check_categories_dir(os.path.join(source_dir, settings.CATEGORIES_DIR)),
+    check_templates_dir(os.path.join(source_dir, settings.TEMPLATES_DIR)),
+    check_static_dir(os.path.join(source_dir, settings.STATIC_DIR)),
+    check_output_dir(settings.OUTPUT_DIR),
+    check_temp_db(settings.TEMP_DB),
 
 
 def check_output_dir(output_dir):
-    shutil.rmtree(OUTPUT_BACKUP_DIR, ignore_errors=True)
+    shutil.rmtree(settings.OUTPUT_BACKUP_DIR, ignore_errors=True)
     if os.path.isdir(output_dir) and os.listdir(output_dir):
-        shutil.move(output_dir, OUTPUT_BACKUP_DIR)
-    shutil.rmtree(OUTPUT_DIR, ignore_errors=True)
+        shutil.move(output_dir, settings.OUTPUT_BACKUP_DIR)
+    shutil.rmtree(settings.OUTPUT_DIR, ignore_errors=True)
 
 
 def check_temp_db(temp_db):
@@ -47,22 +48,24 @@ def check_source_dir(source_dir):
     c_t_msg = ("Either CATEGORIES_DIR or TEMPLATES_DIR must exist "
                "and not be empty.")
 
-    c_dir = os.path.join(source_dir, CATEGORIES_DIR)
-    if CATEGORIES_DIR in os.listdir(source_dir) and os.listdir(c_dir):
+    c_dir = os.path.join(source_dir, settings.CATEGORIES_DIR)
+    if settings.CATEGORIES_DIR in os.listdir(source_dir) and os.listdir(c_dir):
         c_usable = True
     else:
         c_usable = False
-    t_dir = os.path.join(source_dir, TEMPLATES_DIR)
-    if TEMPLATES_DIR in os.listdir(source_dir) and os.listdir(t_dir):
+    t_dir = os.path.join(source_dir, settings.TEMPLATES_DIR)
+    if settings.TEMPLATES_DIR in os.listdir(source_dir) and os.listdir(t_dir):
         t_usable = True
     else:
         t_usable = False
     if not c_usable and not t_usable:
         error(c_t_msg)
     if not c_usable:
-        warn('CATEGORIES_DIR not found or empty', os.path.join(source_dir, CATEGORIES_DIR))
+        warn('CATEGORIES_DIR not found or empty',
+             os.path.join(source_dir, settings.CATEGORIES_DIR))
     if not t_usable:
-        warn('TEMPLATES_DIR not found or empty', os.path.join(source_dir, TEMPLATES_DIR))
+        warn('TEMPLATES_DIR not found or empty',
+             os.path.join(source_dir, settings.TEMPLATES_DIR))
 
     # get rid of c files that are sometimes generated when dir is tested
     if 'c' in os.listdir(source_dir):
@@ -90,8 +93,8 @@ def check_categories_dir(categories_dir):
                 for f2 in os.listdir(os.path.join(category_dir, f)):
                     files.append(f2)
             files.append(f)
-        if POSTS_DIR in os.listdir(category_dir):
-            posts_dir = os.path.join(category_dir, POSTS_DIR)
+        if settings.POSTS_DIR in os.listdir(category_dir):
+            posts_dir = os.path.join(category_dir, settings.POSTS_DIR)
             p_template_exists = False
             p_template_needed = bool(os.listdir(posts_dir))
             for post_fn in os.listdir(posts_dir):
@@ -99,7 +102,7 @@ def check_categories_dir(categories_dir):
                     error('File without .md extension found in POSTS_DIR',
                           os.path.join(category_dir, POSTS_DIR, post_fn))
             for fn in os.listdir(os.path.join(category_dir)):
-                if fnmatch.fnmatch(fn, POST_TEMPLATES_MATCH):
+                if fnmatch.fnmatch(fn, settings.POST_TEMPLATES_MATCH):
                     p_template_exists = True
                     break
             if not p_template_exists and p_template_needed:
@@ -118,16 +121,16 @@ def check_templates_dir(templates_dir):
 
     dirs = os.listdir(templates_dir)
 
-    if INCLUDES_DIR not in dirs:
+    if settings.INCLUDES_DIR not in dirs:
         warn('No includes directory found',
-             os.path.join(templates_dir, INCLUDES_DIR))
+             os.path.join(templates_dir, settings.INCLUDES_DIR))
 
-    if PAGES_DIR not in dirs:
+    if settings.PAGES_DIR not in dirs:
         warn('No pages directory found',
-             os.path.join(templates_dir, PAGES_DIR))
+             os.path.join(templates_dir, settings.PAGES_DIR))
 
     for d in dirs:
-        if d != INCLUDES_DIR and d != PAGES_DIR:
+        if d != settings.INCLUDES_DIR and d != settings.PAGES_DIR:
             error(
                 ('Directory foung in TEMPLATES_DIR not matching INCLUDES_DIR'
                  ' or PAGES_DIR'),

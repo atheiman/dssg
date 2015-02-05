@@ -7,6 +7,8 @@ These are overridden by a config.py if it exists.
 import os
 import sys
 
+from utils.simplog import info, warn, error
+
 
 SOURCE_DIR = sys.argv[1]
 CONFIGURATION_FILE = 'config.py'
@@ -46,6 +48,5 @@ if os.path.isfile(config_file_path):
     try:
         exec(compile(config_file_text, "config.py", 'exec'))
     except Exception as e:
-        raise SystemExit('Failed to import CONFIGURATION_FILE [{f}]. \n\t'
-                         'Exception: {e}'.format(f=config_file_path, e=e))
-    print 'INFO - Imported configuration file [{f}]'.format(f=config_file_path)
+        error('Failed to import CONFIGURATION_FILE', e, config_file_path)
+    info('Imported configuration file', config_file_path)
