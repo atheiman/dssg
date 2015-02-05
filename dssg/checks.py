@@ -16,10 +16,11 @@ import shutil
 
 from django.conf import settings
 
-from .utils.simplog import error, warn, info
+from dssg.utils.simplog import error, warn, info
 
 
 def check_all(source_dir):
+    info('Running pre-generation checks')
     check_source_dir(source_dir),
     check_categories_dir(os.path.join(source_dir, settings.CATEGORIES_DIR)),
     check_templates_dir(os.path.join(source_dir, settings.TEMPLATES_DIR)),
@@ -38,7 +39,7 @@ def check_output_dir(output_dir):
 def check_temp_db(temp_db):
     if os.path.isfile(temp_db):
         os.remove(temp_db)
-        warn('Removed TEMP_DB', temp_db)
+        info('Removed existing temporary database', temp_db)
 
 
 def check_source_dir(source_dir):

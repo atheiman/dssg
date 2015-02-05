@@ -7,7 +7,7 @@ These are overridden by a config.py if it exists.
 import os
 import sys
 
-from utils.simplog import info, warn, error
+from dssg.utils.simplog import info, warn, error
 
 
 SOURCE_DIR = sys.argv[1]
