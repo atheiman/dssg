@@ -12,6 +12,7 @@ from django.core.management import call_command
 
 from dssg.checks import check_all
 from dssg.parsers import parse_source_dir
+from dssg.writers import build_output_tree
 from utils.simplog import info, warn, error
 
 
@@ -25,6 +26,6 @@ def generate(source_dir):
     call_command('makemigrations', verbosity=0)
     call_command('makemigrations', 'static_site_app', verbosity=0)
     call_command('migrate', verbosity=0)
-
+    build_output_tree(source_dir)
     parse_source_dir(source_dir)
 

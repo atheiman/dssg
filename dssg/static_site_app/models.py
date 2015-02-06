@@ -23,7 +23,10 @@ class Category(models.Model):
                                    blank=True,)
 
     def _get_url(self):
-        return '/'.join([settings.URL_PREFIX, self.slug,]) + '/'
+        if settings.URL_PREFIX:
+            return '/'.join([settings.URL_PREFIX, self.slug,]) + '/'
+        else:
+            return '/' + self.slug + '/'
     url = property(_get_url)
 
     _extras_json = models.CharField(max_length=1023,
@@ -41,21 +44,16 @@ class Category(models.Model):
 
 
 class Post(models.Model):
-    _category_dirname = models.CharField(max_length=1023,)
     _filename = models.CharField(max_length=1023,
                                  unique=True,)
+
     def _get_source_path(self):
         return os.path.join(settings.SOURCE_DIR,
                             settings.CATEGORIES_DIR,
-                            self._category_dirname,
+                            self.category.dirname,
                             settings.POSTS_DIR,
                             self._filename,)
     _source_path = property(_get_source_path)
-
-    def _get_output_path(self):
-        return '/'.join([self.category.slug,
-                         self.slug + '.html',])
-    _output_path = property(_get_output_path)
 
     title = models.CharField(max_length=1023,
                              unique=True,)
@@ -67,14 +65,24 @@ class Post(models.Model):
                                  blank=True,
                                  null=True,
                                  related_name='posts',)
-    date = models.DateField(blank=True,)
+    date = models.DateField(blank=True,
+                            null=True,)
     published = models.BooleanField(default=settings.PUBLISHED_DEFAULT,)
     html = models.TextField()
     preview = models.TextField(max_length=1000,
-                               blank=True,)
+                               blank=True,
+                               null=True,)
+
+    def _get_output_path(self):
+        return '/'.join([self.category.slug,
+                         self.slug + settings.DEFAULT_POST_FILE_EXTENSION,])
+    _output_path = property(_get_output_path)
 
     def _get_url(self):
-        return '/'.join([settings.URL_PREFIX, self._get_output_path(),])
+        if settings.URL_PREFIX:
+            return '/'.join([settings.URL_PREFIX, self._output_path,])
+        else:
+            return '/' + self._output_path
     url = property(_get_url)
 
     _extras_json = models.CharField(max_length=1023,
