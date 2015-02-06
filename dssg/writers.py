@@ -58,7 +58,7 @@ def write_category_page(page_dict, category):
 
 def write_post(post, post_files):
     """
-    Write a post to each post_file dict:
+    Write a post from each post_file dict:
 
         {
             'source': 'template string output',
@@ -73,3 +73,19 @@ def write_post(post, post_files):
                                 p_file['filename'])
         info('Writing post to post file in output', [post, p_file['filename']])
         write_file(out_file, p_file['source'])
+
+
+def write_pages(page_file_dicts):
+    """
+    Write a page from each page_file dict:
+
+        {
+            'source': 'template string output',
+            'filename': 'filename' + '.ext',
+        }
+
+    """
+    for page_file in page_file_dicts:
+        out_file = os.path.join(settings.OUTPUT_DIR, page_file['filename'])
+        info('Writing page to page file in output', page_file['filename'])
+        write_file(out_file, page_file['source'])
